@@ -3,9 +3,6 @@ import { Link } from "react-router-dom";
 import Footer from "@/components/layout/Footer";
 import { addressLine, business } from "@/lib/site";
 
-// DRAFT: this policy has not been reviewed by the business owner or a lawyer yet.
-// Review every section, then set IS_DRAFT to false to remove the notice on the page.
-const IS_DRAFT = true;
 const LAST_UPDATED = "10 October 2026";
 
 const { address } = business;
@@ -47,13 +44,6 @@ const PrivacyPolicy = () => {
         <section className="pb-32">
           <div className="container-wide">
             <div className="max-w-3xl space-y-12 text-muted-foreground leading-relaxed">
-              {IS_DRAFT && (
-                <p className="rounded-2xl border border-amber-500/40 bg-amber-500/10 px-5 py-4 text-sm text-amber-200">
-                  <strong className="font-semibold">Draft.</strong> This policy is awaiting final
-                  review and may change.
-                </p>
-              )}
-
               <Section title="1. Who we are">
                 <p>
                   {business.name} is a software engineering studio located at {postalAddress}. We

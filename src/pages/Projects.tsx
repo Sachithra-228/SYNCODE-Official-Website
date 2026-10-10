@@ -18,28 +18,6 @@ type ProjectItem = {
 
 const projects: ProjectItem[] = [
   {
-    id: 1,
-    title: "FinFlow Pro",
-    category: "Enterprise Platform",
-    description:
-      "A comprehensive financial management platform serving 50,000+ users with real-time analytics, secure transaction orchestration, and intelligent automation workflows for finance teams.",
-    mediaSrc: "/finflow.webp",
-    bgImageSrc: "/finflow.webp",
-    href: "/projects/finflow-pro",
-    tags: ["React", "Node.js", "PostgreSQL", "AI/ML"],
-  },
-  {
-    id: 2,
-    title: "HealthSync",
-    category: "Mobile Application",
-    description:
-      "Cross-platform health tracking app with AI-powered insights, wearable-device integrations, and a seamless mobile-first patient experience.",
-    mediaSrc: "/healthsync.webp",
-    bgImageSrc: "/healthsync.webp",
-    href: "/projects/healthsync",
-    tags: ["React Native", "TypeScript", "Firebase", "ML"],
-  },
-  {
     id: 3,
     title: "China Lanka Motors",
     category: "Automotive Website",

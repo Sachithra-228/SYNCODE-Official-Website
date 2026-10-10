@@ -97,19 +97,9 @@ export const pages: Record<string, PageMeta> = {
       "Web hosting, deployment, security monitoring, and ongoing maintenance to keep your applications running smoothly.",
   },
   "/projects": {
-    title: "Projects & Case Studies | Team SYNCODE",
+    title: "Our Projects | Team SYNCODE",
     description:
       "Selected websites, platforms, and apps built by Team SYNCODE for automotive, travel, hospitality, healthcare, and lifestyle brands.",
-  },
-  "/projects/finflow-pro": {
-    title: "FinFlow Pro – Enterprise Platform | Team SYNCODE",
-    description:
-      "Case study: FinFlow Pro, a financial management platform with real-time analytics, intelligent automation, and role-based access control.",
-  },
-  "/projects/healthsync": {
-    title: "HealthSync – Mobile Application | Team SYNCODE",
-    description:
-      "Case study: HealthSync, a cross-platform health tracking app with personalised insights and wearable-device integrations.",
   },
   "/about": {
     title: "About Us | Team SYNCODE",

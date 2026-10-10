@@ -4,30 +4,30 @@ import { ArrowUpRight } from "lucide-react";
 
 const projects = [
   {
-    id: 1,
-    title: "FinFlow Pro",
-    category: "Enterprise Platform",
-    description: "A comprehensive financial management platform serving 50,000+ users.",
-    image: "/finflow.webp",
-    path: "/projects/finflow-pro",
-    isExternal: false,
-  },
-  {
-    id: 2,
-    title: "HealthSync",
-    category: "Mobile Application",
-    description: "Cross-platform health tracking app with AI-powered insights.",
-    image: "/healthsync.webp",
-    path: "/projects/healthsync",
-    isExternal: false,
-  },
-  {
     id: 3,
     title: "China Lanka Motors",
     category: "Automotive Website",
     description: "Conversion-focused automotive platform with clear inventory and lead capture.",
     image: "/chinalankamotors.webp",
     path: "https://www.chinalankamotors.com/",
+    isExternal: true,
+  },
+  {
+    id: 4,
+    title: "Jayas Victory Travels",
+    category: "Travel Platform",
+    description: "Travel-focused web experience that highlights tours and simplifies enquiries.",
+    image: "/jayasvictorytravel.webp",
+    path: "https://www.jayasvictorytravels.com/",
+    isExternal: true,
+  },
+  {
+    id: 7,
+    title: "Unicare Connect",
+    category: "Healthcare Platform",
+    description: "Healthcare-oriented digital platform built for clarity, accessibility, and trust.",
+    image: "/unicareconnect.webp",
+    path: "https://www.unicareconnect.com/",
     isExternal: true,
   },
 ];
