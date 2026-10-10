@@ -4,7 +4,7 @@ import path from "path";
 import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => ({
+export default defineConfig(({ mode, isSsrBuild }) => ({
   server: {
     host: "::",
     port: 8080,
@@ -20,19 +20,21 @@ export default defineConfig(({ mode }) => ({
     // Improve chunking to reduce initial bundle size
     rollupOptions: {
       output: {
-        manualChunks: {
-          // Vendor chunk — heavy libraries loaded separately
-          "vendor-react": ["react", "react-dom", "react-router-dom"],
-          "vendor-motion": ["framer-motion"],
-          "vendor-radix": [
-            "@radix-ui/react-accordion",
-            "@radix-ui/react-dialog",
-            "@radix-ui/react-tabs",
-            "@radix-ui/react-tooltip",
-          ],
-          "vendor-spline": ["@splinetool/react-spline", "@splinetool/runtime"],
-          "vendor-query": ["@tanstack/react-query"],
-        },
+        // Dependencies are external in the SSR (pre-render) build, so only chunk the client build
+        manualChunks: isSsrBuild
+          ? undefined
+          : {
+              // Vendor chunk — heavy libraries loaded separately
+              "vendor-react": ["react", "react-dom", "react-router-dom"],
+              "vendor-motion": ["framer-motion"],
+              "vendor-radix": [
+                "@radix-ui/react-accordion",
+                "@radix-ui/react-dialog",
+                "@radix-ui/react-tabs",
+                "@radix-ui/react-tooltip",
+              ],
+              "vendor-query": ["@tanstack/react-query"],
+            },
       },
     },
     // Warn if any chunk exceeds 800KB

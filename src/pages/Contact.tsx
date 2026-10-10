@@ -2,7 +2,9 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Send, Phone, MapPin, Mail, ArrowUpRight, CheckCircle2 } from "lucide-react";
 import emailjs from "@emailjs/browser";
+import { Link } from "react-router-dom";
 import Footer from "@/components/layout/Footer";
+import { business, formatHours, localityLine } from "@/lib/site";
 
 const WhatsAppIcon = ({ size = 20 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
@@ -25,30 +27,30 @@ const contactCards = [
   {
     icon: Mail,
     label: "Email Us",
-    value: "team.syncode@gmail.com",
+    value: business.email,
     sub: "We reply within 24 hours",
-    href: "mailto:team.syncode@gmail.com",
+    href: `mailto:${business.email}`,
   },
   {
     icon: Phone,
     label: "Call Us",
-    value: "+94 77 921 4221",
-    sub: "Mon – Sat, 9 AM – 6 PM",
-    href: "tel:+94779214221",
+    value: business.phone,
+    sub: "Mon – Fri 9:00 – 18:00, Sat 9:00 – 13:00",
+    href: business.phoneHref,
   },
   {
     icon: WhatsAppIcon,
     label: "WhatsApp",
-    value: "+94 70 291 1223",
+    value: business.whatsapp,
     sub: "Message us anytime",
-    href: "https://wa.me/94702911223",
+    href: business.whatsappHref,
   },
   {
     icon: MapPin,
     label: "Our Location",
-    value: "Team SYNCODE, Sri Lanka",
-    sub: "Serving clients globally",
-    href: "https://www.google.com/maps/place/Team+SYNCODE/@6.8624524,79.9621747,17z",
+    value: business.address.street,
+    sub: `${localityLine}, ${business.address.country}`,
+    href: business.mapsUrl,
   },
 ];
 
@@ -302,7 +304,12 @@ const Contact = () => {
                       </button>
 
                       <p className="text-xs text-muted-foreground text-center">
-                        A confirmation will be sent to your email. Your information is never shared with third parties.
+                        A confirmation will be sent to your email. We only use your details to respond to
+                        your enquiry. See our{" "}
+                        <Link to="/privacy-policy" className="underline underline-offset-4 hover:text-foreground">
+                          Privacy Policy
+                        </Link>
+                        .
                       </p>
                     </motion.form>
                   )}
@@ -348,6 +355,30 @@ const Contact = () => {
                         className="text-foreground/20 group-hover:text-foreground transition-colors flex-shrink-0 mt-1" />
                     </a>
                   ))}
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 p-5 rounded-2xl bg-card border border-border/50">
+                  <address className="not-italic">
+                    <h3 className="font-semibold text-sm mb-2">{business.name}</h3>
+                    <p className="text-sm text-foreground/80 leading-relaxed">
+                      {business.address.street}
+                      <br />
+                      {localityLine}
+                      <br />
+                      {business.address.country}
+                    </p>
+                  </address>
+                  <div>
+                    <h3 className="font-semibold text-sm mb-2">Business Hours</h3>
+                    <dl className="text-sm text-foreground/80 leading-relaxed">
+                      {business.hours.map((h) => (
+                        <div key={h.label} className="flex justify-between gap-4">
+                          <dt>{h.label}</dt>
+                          <dd>{formatHours(h)}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                  </div>
                 </div>
 
                 <div className="rounded-3xl overflow-hidden bg-card border border-border/50" style={{ height: 300 }}>

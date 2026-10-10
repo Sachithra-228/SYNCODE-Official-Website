@@ -50,3 +50,12 @@ Contributions from the team are welcome. Please follow existing code standards, 
 
 ## License
 MIT License (or update this section with the chosen license).
+
+## Build and pre-rendering
+The site is a Vite + React SPA that is pre-rendered at build time, so every page ships its real content in the HTML (needed for search engines and link previews).
+
+- `npm run build` builds the client, builds a server bundle (`src/entry-server.tsx`), then runs `scripts/prerender.mjs`, which writes `dist/<route>/index.html` for every route, plus `404.html` and `sitemap.xml`.
+- `npm run preview` serves `dist/` the same way Vercel does.
+- **Adding a page:** add the route in `src/App.tsx` and add its path, title and description to `pages` in `src/lib/site.ts`. A route that is missing from that list is not pre-rendered and returns 404 when opened directly.
+- Business details (name, address, phone, hours, social links) live in `src/lib/site.ts` and must match the Google Business Profile.
+- Code that touches `window` or `document` must run inside `useEffect`, because components also render in Node during the build.

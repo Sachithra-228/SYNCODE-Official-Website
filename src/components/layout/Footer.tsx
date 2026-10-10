@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowUpRight, Facebook, Instagram, Linkedin } from "lucide-react";
 import logo from "@/assets/syncode-logo.png";
+import { addressLine, business, formatHours } from "@/lib/site";
 
 const TikTokIcon = ({ size = 20 }: { size?: number }) => (
   <svg
@@ -17,22 +18,22 @@ const TikTokIcon = ({ size = 20 }: { size?: number }) => (
 const socialLinks = [
   {
     name: "Facebook",
-    href: "https://www.facebook.com/profile.php?id=61580786259033",
+    href: business.social.facebook,
     icon: Facebook,
   },
   {
     name: "Instagram",
-    href: "https://www.instagram.com/team.syncode/",
+    href: business.social.instagram,
     icon: Instagram,
   },
   {
     name: "LinkedIn",
-    href: "https://www.linkedin.com/in/team-syncode-680938398/",
+    href: business.social.linkedin,
     icon: Linkedin,
   },
   {
     name: "TikTok",
-    href: "https://www.tiktok.com/@syncode4",
+    href: business.social.tiktok,
     icon: TikTokIcon,
   },
 ];
@@ -50,6 +51,7 @@ const footerLinks = {
     { name: "About Us", path: "/about" },
     { name: "Projects", path: "/projects" },
     { name: "Contact", path: "/contact" },
+    { name: "Privacy Policy", path: "/privacy-policy" },
   ],
 };
 
@@ -89,9 +91,9 @@ export const Footer = () => {
 
           {/* Services Column */}
           <div>
-            <h4 className="text-sm font-semibold text-foreground mb-6 tracking-wide uppercase">
+            <h3 className="text-sm font-semibold text-foreground mb-6 tracking-wide uppercase">
               Services
-            </h4>
+            </h3>
             <ul className="space-y-4">
               {footerLinks.services.map((link) => (
                 <li key={link.name}>
@@ -109,9 +111,9 @@ export const Footer = () => {
 
           {/* Company Column */}
           <div>
-            <h4 className="text-sm font-semibold text-foreground mb-6 tracking-wide uppercase">
+            <h3 className="text-sm font-semibold text-foreground mb-6 tracking-wide uppercase">
               Company
-            </h4>
+            </h3>
             <ul className="space-y-4">
               {footerLinks.company.map((link) => (
                 <li key={link.name}>
@@ -129,12 +131,34 @@ export const Footer = () => {
 
           {/* Contact Column */}
           <div>
-            <h4 className="text-sm font-semibold text-foreground mb-6 tracking-wide uppercase">
+            <h3 className="text-sm font-semibold text-foreground mb-6 tracking-wide uppercase">
               Get in Touch
-            </h4>
-            <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
-              Ready to start your next project? Let's build something remarkable together.
-            </p>
+            </h3>
+            <address className="not-italic text-sm text-muted-foreground leading-relaxed mb-6 space-y-3">
+              <p>
+                <span className="text-foreground font-medium">{business.name}</span>
+                <br />
+                {addressLine}
+                <br />
+                {business.address.country}
+              </p>
+              <p>
+                <a href={business.phoneHref} className="hover:text-foreground transition-colors duration-300">
+                  {business.phone}
+                </a>
+                <br />
+                <a href={`mailto:${business.email}`} className="hover:text-foreground transition-colors duration-300">
+                  {business.email}
+                </a>
+              </p>
+              <p>
+                {business.hours.map((h) => (
+                  <span key={h.label} className="block">
+                    {`${h.label}: ${formatHours(h)}`}
+                  </span>
+                ))}
+              </p>
+            </address>
             <Link
               to="/contact"
               className="inline-flex items-center gap-2 px-6 py-3 bg-foreground text-background 
@@ -154,7 +178,7 @@ export const Footer = () => {
         <div className="mt-16 pt-8 border-t border-border flex flex-col sm:flex-row 
                         items-center justify-between gap-4">
           <p className="text-sm text-muted-foreground">
-            © {currentYear} SYNCODE. All rights reserved.
+            © {currentYear} {business.name}. All rights reserved.
           </p>
           <p className="text-sm text-muted-foreground">
             Crafted with precision in modern technologies.
