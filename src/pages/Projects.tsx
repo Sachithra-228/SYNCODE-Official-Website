@@ -77,6 +77,18 @@ const projects: ProjectItem[] = [
     hrefExternal: true,
     tags: ["Healthcare", "Accessibility", "Product Design"],
   },
+  {
+    id: 8,
+    title: "Valor Clothing",
+    category: "Fashion E-Commerce",
+    description:
+      "A premium fashion shopping experience for luxury clothing essentials, limited capsules, and editorial collections.",
+    mediaSrc: "/screens/valorclothing.webp",
+    bgImageSrc: "/screens/valorclothing.webp",
+    href: "https://www.valorclothing.lk/",
+    hrefExternal: true,
+    tags: ["E-Commerce", "Fashion", "Brand Experience"],
+  },
 ];
 
 const Projects = () => {

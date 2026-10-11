@@ -99,7 +99,7 @@ export const pages: Record<string, PageMeta> = {
   "/projects": {
     title: "Our Projects | Team SYNCODE",
     description:
-      "Selected websites, platforms, and apps built by Team SYNCODE for automotive, travel, hospitality, healthcare, and lifestyle brands.",
+      "Selected websites, platforms, and apps built by Team SYNCODE for automotive, travel, fashion, hospitality, healthcare, and lifestyle brands.",
   },
   "/about": {
     title: "About Us | Team SYNCODE",
