@@ -1,0 +1,129 @@
+/* Site-wide motion: smooth scrolling, text-roll hover, crosshair markers. */
+
+/* ── Lenis smooth scrolling ───────────────────────────────────────── */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+/* Native smooth scrolling would fight Lenis */
+html.lenis {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: clip;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+/* ── Text roll: letters roll up to a copy of themselves on hover ──── */
+.roll-text {
+  position: relative;
+  display: inline-flex;
+  overflow: hidden;
+  /* Room for descenders without clipping */
+  padding-block: 0.08em;
+  margin-block: -0.08em;
+  line-height: 1.15;
+  vertical-align: bottom;
+}
+.roll-char {
+  position: relative;
+  display: inline-block;
+  white-space: pre;
+  transition: transform 0.5s cubic-bezier(0.65, 0, 0.35, 1);
+  transition-delay: calc(var(--i, 0) * 16ms);
+}
+.roll-char::after {
+  content: attr(data-char);
+  position: absolute;
+  left: 0;
+  top: 100%;
+  padding-top: 0.16em;
+}
+.roll-host:hover .roll-char,
+.roll-host:focus-visible .roll-char,
+.btn-primary:hover .roll-char,
+.btn-primary:focus-visible .roll-char,
+.btn-secondary:hover .roll-char,
+.btn-secondary:focus-visible .roll-char {
+  transform: translateY(calc(-100% - 0.16em));
+}
+
+/* ── Footer headline wave ─────────────────────────────────────────── */
+@keyframes letter-wave {
+  0% { transform: translateY(0); }
+  35% { transform: translateY(-0.18em) rotate(-4deg); }
+  70% { transform: translateY(0.04em); }
+  100% { transform: translateY(0); }
+}
+.wave-char {
+  display: inline-block;
+  /* Room below the baseline so descenders (g, y) keep their gradient fill */
+  padding-bottom: 0.14em;
+  margin-bottom: -0.14em;
+}
+.wave-host:hover .wave-char {
+  animation: letter-wave 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation-delay: calc(var(--i, 0) * 28ms);
+}
+
+/* ── Client logo rows (homepage) ──────────────────────────────────── */
+@keyframes logo-row-left {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes logo-row-right {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
+}
+
+/* ── Crosshair markers ────────────────────────────────────────────── */
+.crosshair {
+  position: absolute;
+  width: 13px;
+  height: 13px;
+  transform: translate(-50%, -50%) scale(var(--s, 1)) rotate(var(--r, 0deg));
+  opacity: var(--o, 0.35);
+  transition: transform 0.35s ease-out, opacity 0.35s ease-out;
+  pointer-events: none;
+}
+.crosshair::before,
+.crosshair::after {
+  content: "";
+  position: absolute;
+  background: hsl(var(--foreground));
+}
+.crosshair::before {
+  left: 6px;
+  top: 0;
+  width: 1px;
+  height: 13px;
+}
+.crosshair::after {
+  top: 6px;
+  left: 0;
+  width: 13px;
+  height: 1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .roll-char,
+  .crosshair {
+    transition: none;
+  }
+  .roll-host:hover .roll-char,
+  .roll-host:focus-visible .roll-char,
+  .btn-primary:hover .roll-char,
+  .btn-primary:focus-visible .roll-char,
+  .btn-secondary:hover .roll-char,
+  .btn-secondary:focus-visible .roll-char {
+    transform: none;
+  }
+  .wave-host:hover .wave-char {
+    animation: none;
+  }
+}

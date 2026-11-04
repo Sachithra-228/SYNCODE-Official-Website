@@ -1,280 +1,229 @@
-import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion, useInView, useReducedMotion } from "framer-motion";
+import { type MouseEvent } from "react";
+import { motion, useMotionValue, useReducedMotion, useSpring } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowUpRight } from "lucide-react";
+import { RollText } from "@/components/ui/roll-text";
+import { cn } from "@/lib/utils";
 
-const projects = [
-  {
-    title: "China Lanka Motors",
-    category: "Automotive Website",
-    description: "Conversion-focused automotive platform with clear inventory and lead capture.",
-    image: "/screens/chinalankamotors.webp",
-    url: "https://www.chinalankamotors.com/",
-    domain: "chinalankamotors.com",
-  },
-  {
-    title: "Jayas Victory Travels",
-    category: "Travel Platform",
-    description: "Travel-focused web experience that highlights tours and simplifies enquiries.",
-    image: "/screens/jayasvictorytravel.webp",
-    url: "https://www.jayasvictorytravels.com/",
-    domain: "jayasvictorytravels.com",
-  },
-  {
-    title: "Valor Clothing",
-    category: "Fashion E-Commerce",
-    description: "Premium fashion storefront for luxury clothing essentials and limited capsules.",
-    image: "/screens/valorclothing.webp",
-    url: "https://www.valorclothing.lk/",
-    domain: "valorclothing.lk",
-  },
-  {
-    title: "Unicare Connect",
-    category: "Student Support Platform",
-    description: "Financial aid, career growth, wellness services, and mentorship for university students in one platform.",
-    image: "/screens/unicareconnect.webp",
-    url: "https://www.unicareconnect.com/",
-    domain: "unicareconnect.com",
-  },
-  {
-    title: "Hotel Seven Way",
-    category: "Hospitality Website",
-    description: "Modern hotel website focused on visual storytelling and room discovery.",
-    image: "/screens/hotelsevenway.webp",
-    url: "https://hotel-seven-way.vercel.app/",
-    domain: "hotel-seven-way.vercel.app",
-  },
-  {
-    title: "Maison Ashri",
-    category: "Lifestyle Brand Site",
-    description: "Refined, brand-forward web experience with minimal design and smooth storytelling.",
-    image: "/screens/maisonashri.webp",
-    url: "https://maisonashri.vercel.app/",
-    domain: "maisonashri.vercel.app",
-  },
+type Client = {
+  name: string;
+  industry: string;
+  /** Logo file in /public/logos */
+  logo: string;
+  /** The logo image's own background colour, so the tile blends with it */
+  bg: string;
+  /** Square logos with lots of empty space around them are drawn larger */
+  large?: boolean;
+};
+
+// Ordered so light and dark tiles alternate across the grid
+const clients: Client[] = [
+  { name: "China Lanka Motors", industry: "Automotive", logo: "/logos/china-lanka-motors.png", bg: "#ffffff", large: true },
+  { name: "Valor", industry: "Fashion E-Commerce", logo: "/logos/valor.png", bg: "#040404" },
+  { name: "Jayas Victory Travels", industry: "Travel & Tourism", logo: "/logos/jayas-victory-travels.png", bg: "#fdfdfd", large: true },
+  { name: "REHOB", industry: "Artist Management", logo: "/logos/rehob.png", bg: "#131315" },
+  { name: "Prasanna Tailors", industry: "Tailoring", logo: "/logos/prasanna-tailors.png", bg: "#100f0c" },
+  { name: "Voigue", industry: "Corporate & Careers", logo: "/logos/voigue.png", bg: "#ffffff" },
+  { name: "Amara", industry: "Construction", logo: "/logos/amara.png", bg: "#1e1e1e" },
+  { name: "Bloom Coffee Shop", industry: "Café", logo: "/logos/bloom.png", bg: "#000000" },
 ];
 
-const ROTATE_MS = 5000;
 const pad = (n: number) => String(n).padStart(2, "0");
 
-export const ProjectsPreview = () => {
-  const [active, setActive] = useState(0);
-  const [seen, setSeen] = useState([0]);
-  const [hovered, setHovered] = useState(false);
-  const [focused, setFocused] = useState(false);
-  // Auto-rotation stops for good once a visitor picks a client by tapping
-  const [auto, setAuto] = useState(true);
-  // True while a press started on an inactive row, so a tap selects it instead of opening the site
-  const pressedInactive = useRef(false);
-
-  const showcaseRef = useRef<HTMLDivElement>(null);
-  const inView = useInView(showcaseRef, { amount: 0.3 });
+// ---------------------------------------------------------------------------
+// Logo tile: tilts toward the pointer, the logo lifts, and a light sweeps across
+// ---------------------------------------------------------------------------
+const LogoTile = ({ client }: { client: Client }) => {
   const reducedMotion = useReducedMotion();
-  const playing = auto && inView && !hovered && !focused && !reducedMotion;
+  const rx = useMotionValue(0);
+  const ry = useMotionValue(0);
+  const rotateX = useSpring(rx, { stiffness: 160, damping: 16 });
+  const rotateY = useSpring(ry, { stiffness: 160, damping: 16 });
 
-  useEffect(() => {
-    setSeen((prev) => (prev.includes(active) ? prev : [...prev, active]));
-  }, [active]);
-
-  useEffect(() => {
-    if (!playing) return;
-    const timer = setTimeout(() => setActive((i) => (i + 1) % projects.length), ROTATE_MS);
-    return () => clearTimeout(timer);
-  }, [active, playing]);
-
-  const current = projects[active];
-  const next = (active + 1) % projects.length;
+  const onMove = (e: MouseEvent<HTMLDivElement>) => {
+    if (reducedMotion) return;
+    const r = e.currentTarget.getBoundingClientRect();
+    ry.set(((e.clientX - r.left) / r.width - 0.5) * 14);
+    rx.set(-((e.clientY - r.top) / r.height - 0.5) * 14);
+  };
+  const onLeave = () => {
+    rx.set(0);
+    ry.set(0);
+  };
 
   return (
-    <section className="section-padding relative overflow-hidden bg-background">
-      {/* Background gradient */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px]
-                      bg-gradient-radial from-foreground/3 to-transparent rounded-full blur-3xl" />
-
-      <div className="container-wide relative z-10">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12 md:mb-16"
+      <motion.div
+        onMouseMove={onMove}
+        onMouseLeave={onLeave}
+        style={{ rotateX, rotateY, transformPerspective: 900 }}
+        className="group w-[220px] shrink-0 md:w-[280px]"
+      >
+        {/* Logo panel */}
+        <div
+          className="relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-2xl ring-1 ring-white/10 transition-shadow duration-500 group-hover:shadow-[0_30px_60px_-20px_rgba(0,0,0,0.9)] group-hover:ring-white/30"
+          style={{ backgroundColor: client.bg }}
         >
-          <div>
-            <span className="text-sm font-medium text-muted-foreground tracking-widest uppercase mb-4 block">
-              Client Trust
-            </span>
-            <h2 className="text-display-lg">
-              Brands That
-              <br />
-              <span className="gradient-text">Trust Us</span>
-            </h2>
-            <p className="mt-6 text-lg text-muted-foreground max-w-xl">
-              Real businesses running on websites we designed and built. Every one of them is
-              live, so you can visit it yourself.
-            </p>
-          </div>
-          <Link
-            to="/projects"
-            className="btn-secondary self-start md:self-auto"
-          >
-            View All Projects
-            <ArrowUpRight size={18} className="ml-2" />
-          </Link>
-        </motion.div>
+          <img
+            src={client.logo}
+            alt={`${client.name} logo`}
+            loading="lazy"
+            className={client.large ? "h-[96%] w-auto object-contain transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-110" : "max-h-[68%] max-w-[72%] object-contain transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-110"}
+          />
+          {/* Light sweep on hover */}
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-y-0 -left-1/2 w-1/2 -skew-x-12 bg-gradient-to-r from-transparent via-white/25 to-transparent opacity-0 transition-all duration-1000 ease-out group-hover:left-[120%] group-hover:opacity-100"
+          />
+        </div>
 
-        <motion.div
-          ref={showcaseRef}
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          viewport={{ once: true }}
-          onPointerEnter={(e) => e.pointerType === "mouse" && setHovered(true)}
-          onPointerLeave={() => setHovered(false)}
-          onFocus={() => setFocused(true)}
-          onBlur={() => setFocused(false)}
-          className="grid gap-10 lg:grid-cols-12 lg:gap-14 lg:items-center"
-        >
-          {/* Client list: hover, focus or tap a name to preview it */}
-          <ul className="order-2 lg:order-1 lg:col-span-5 border-t border-border">
-            {projects.map((project, index) => {
-              const isActive = index === active;
-              return (
-                <li key={project.title}>
-                  <a
-                    href={project.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onPointerEnter={(e) => e.pointerType === "mouse" && setActive(index)}
-                    onPointerDown={() => { pressedInactive.current = !isActive; }}
-                    onFocus={() => setActive(index)}
-                    onClick={(e) => {
-                      if (pressedInactive.current) {
-                        e.preventDefault();
-                        setActive(index);
-                        setAuto(false);
-                      }
-                      pressedInactive.current = false;
-                    }}
-                    className="group relative flex items-center gap-5 py-5 border-b border-border
-                               focus:outline-none focus-visible:bg-foreground/5"
-                  >
-                    <span
-                      className={`font-mono text-sm transition-colors duration-300
-                                  ${isActive ? "text-foreground" : "text-foreground/30"}`}
-                    >
-                      {pad(index + 1)}
-                    </span>
-                    <span className="flex-1 min-w-0">
-                      <span
-                        className={`block truncate text-2xl md:text-3xl font-semibold tracking-tight
-                                    transition-all duration-300
-                                    ${isActive ? "text-foreground translate-x-2" : "text-foreground/35"}`}
-                      >
-                        {project.title}
-                      </span>
-                      <span
-                        className={`block text-sm transition-all duration-300
-                                    ${isActive ? "text-muted-foreground translate-x-2" : "text-foreground/25"}`}
-                      >
-                        {project.category}
-                      </span>
-                    </span>
-                    <ArrowUpRight
-                      size={22}
-                      className={`flex-shrink-0 transition-all duration-300
-                                  ${isActive ? "opacity-100 text-foreground" : "opacity-0 -translate-x-2"}`}
-                    />
-
-                    {/* Progress line: fills while this client is on show */}
-                    {isActive && (
-                      playing ? (
-                        <motion.span
-                          key={`run-${index}`}
-                          initial={{ scaleX: 0 }}
-                          animate={{ scaleX: 1 }}
-                          transition={{ duration: ROTATE_MS / 1000, ease: "linear" }}
-                          className="absolute -bottom-px left-0 h-px w-full origin-left bg-foreground"
-                        />
-                      ) : (
-                        <span className="absolute -bottom-px left-0 h-px w-full bg-foreground" />
-                      )
-                    )}
-                  </a>
-                </li>
-              );
-            })}
-          </ul>
-
-          {/* Showcase */}
-          <div className="order-1 lg:order-2 lg:col-span-7">
-            <a
-              href={current.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={`Visit ${current.title} (${current.domain})`}
-              className="group relative block aspect-[16/9] overflow-hidden rounded-3xl bg-card
-                         border border-border/50 shadow-card"
-            >
-              {projects.map((project, index) => {
-                const isActive = index === active;
-                // Only load the images that have been shown, plus the one coming up next
-                if (!isActive && !seen.includes(index) && !(inView && index === next)) return null;
-                return (
-                  <img
-                    key={project.title}
-                    src={project.image}
-                    alt={isActive ? `Screenshot of the ${project.title} website` : ""}
-                    loading="lazy"
-                    className={`absolute inset-0 h-full w-full object-cover object-top transition-all duration-700
-                                group-hover:scale-105
-                                ${isActive ? "opacity-100 scale-100" : "opacity-0 scale-110"}`}
-                  />
-                );
-              })}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30" />
-
-              {/* Live domain */}
-              <div className="absolute top-4 left-4 flex items-center gap-2.5 px-4 py-2 glass rounded-full
-                              text-xs font-medium text-foreground">
-                <span className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
-                </span>
-                {current.domain}
-              </div>
-
-              <span className="absolute top-4 right-4 flex h-11 w-11 items-center justify-center rounded-full
-                               bg-foreground text-background transition-transform duration-300
-                               group-hover:rotate-45">
-                <ArrowUpRight size={20} />
-              </span>
-
-              <span className="absolute bottom-4 right-5 font-mono text-sm text-white/80">
-                {`${pad(active + 1)} / ${pad(projects.length)}`}
-              </span>
-            </a>
-
-            {/* Caption */}
-            <div className="mt-6 min-h-[5.5rem]">
-              <AnimatePresence mode="wait" initial={false}>
-                <motion.div
-                  key={current.title}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.25 }}
-                >
-                  <h3 className="text-xl font-semibold mb-2">{current.title}</h3>
-                  <p className="text-muted-foreground max-w-xl">{current.description}</p>
-                </motion.div>
-              </AnimatePresence>
-            </div>
-          </div>
-        </motion.div>
-      </div>
-    </section>
+        {/* Name */}
+        <div className="mt-4 px-1">
+          <h3 className="truncate text-base font-semibold transition-transform duration-500 group-hover:translate-x-1 md:text-lg">
+            {client.name}
+          </h3>
+          <p className="mt-0.5 text-xs text-muted-foreground">{client.industry}</p>
+        </div>
+      </motion.div>
   );
 };
+
+// ---------------------------------------------------------------------------
+// A row of logo cards that never stops moving. The cards are repeated so the
+// loop is seamless; hovering the row pauses it.
+// ---------------------------------------------------------------------------
+const LogoRow = ({ items, direction }: { items: Client[]; direction: "left" | "right" }) => {
+  // Enough copies to fill wide screens, then the whole set twice for the -50% loop
+  const set = [...items, ...items, ...items];
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: direction === "right" ? -120 : 120 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      viewport={{ once: true, amount: 0.3 }}
+      transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+      className="group/row overflow-hidden py-3 [mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)]"
+    >
+      <div
+        className={cn(
+          "flex w-max group-hover/row:[animation-play-state:paused]",
+          direction === "right"
+            ? "animate-[logo-row-right_50s_linear_infinite]"
+            : "animate-[logo-row-left_50s_linear_infinite]"
+        )}
+        style={{ perspective: 1400 }}
+      >
+        {[0, 1].map((half) => (
+          // Trailing padding equals the gap, so the -50% loop lands exactly on the next copy
+          <div key={half} className="flex gap-4 pr-4 md:gap-5 md:pr-5">
+            {set.map((client, i) => (
+              <LogoTile key={`${half}-${i}`} client={client} />
+            ))}
+          </div>
+        ))}
+      </div>
+    </motion.div>
+  );
+};
+
+// ---------------------------------------------------------------------------
+// Slow marquee of client names under the grid
+// ---------------------------------------------------------------------------
+const NameMarquee = () => (
+  <div
+    aria-hidden="true"
+    className="group relative mt-12 overflow-hidden border-y border-white/10 py-6 [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]"
+  >
+    <div className="flex w-max animate-[client-marquee_45s_linear_infinite] group-hover:[animation-play-state:paused]">
+      {[0, 1].map((copy) => (
+        <div key={copy} className="flex items-center">
+          {clients.map((c) => (
+            <span key={c.name} className="flex items-center">
+              <span
+                className="whitespace-nowrap px-8 text-[clamp(2rem,5vw,4rem)] font-black uppercase tracking-tight text-transparent transition-colors duration-300 hover:text-foreground"
+                style={{ WebkitTextStroke: "1px hsl(var(--foreground) / 0.35)" }}
+              >
+                {c.name}
+              </span>
+              <span className="text-xl text-foreground/30">✦</span>
+            </span>
+          ))}
+        </div>
+      ))}
+    </div>
+    <style>{`
+      @keyframes client-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+      @media (prefers-reduced-motion: reduce) {
+        [class*="client-marquee"] { animation-duration: 120s !important; }
+      }
+    `}</style>
+  </div>
+);
+
+export const ProjectsPreview = () => (
+  <section className="relative overflow-hidden bg-background pb-10 pt-24 md:pb-14 md:pt-32 lg:pt-40">
+    <div
+      aria-hidden="true"
+      className="pointer-events-none absolute left-1/2 top-0 h-[800px] w-[800px] -translate-x-1/2 rounded-full bg-gradient-radial from-foreground/[0.04] to-transparent blur-3xl"
+    />
+
+    <div className="container-wide relative z-10">
+      {/* Header */}
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        viewport={{ once: true }}
+        className="mb-12 flex flex-col gap-6 md:mb-16 md:flex-row md:items-end md:justify-between"
+      >
+        <div>
+          <span className="mb-4 block text-sm font-medium uppercase tracking-widest text-muted-foreground">
+            Client Trust
+          </span>
+          <h2 className="text-display-lg">
+            Brands That
+            <br />
+            <span className="gradient-text">Trust Us</span>
+          </h2>
+          <p className="mt-6 max-w-xl text-lg text-muted-foreground">
+            Businesses across Sri Lanka that run on websites and platforms we designed and built.
+          </p>
+        </div>
+        <div className="flex flex-col items-start gap-6 md:items-end">
+          <dl className="flex gap-10">
+            <div>
+              <dt className="text-xs uppercase tracking-widest text-muted-foreground">Clients</dt>
+              <dd className="mt-1 font-mono text-3xl font-bold">{pad(clients.length)}</dd>
+            </div>
+            <div>
+              <dt className="text-xs uppercase tracking-widest text-muted-foreground">Industries</dt>
+              <dd className="mt-1 font-mono text-3xl font-bold">
+                {pad(new Set(clients.map((c) => c.industry)).size)}
+              </dd>
+            </div>
+          </dl>
+          <Link to="/projects" className="btn-secondary">
+            <RollText>View All Projects</RollText>
+            <ArrowUpRight size={18} className="ml-2" />
+          </Link>
+        </div>
+      </motion.div>
+
+    </div>
+
+    {/* Logo rows: the first drifts left to right, the second right to left */}
+    <ul className="sr-only" aria-label="Our clients">
+      {clients.map((c) => (
+        <li key={c.name}>
+          {c.name}, {c.industry}
+        </li>
+      ))}
+    </ul>
+    <div aria-hidden="true" className="relative z-10 space-y-2 md:space-y-3">
+      <LogoRow items={clients.slice(0, 4)} direction="right" />
+      <LogoRow items={clients.slice(4)} direction="left" />
+    </div>
+
+    <NameMarquee />
+  </section>
+);
 
 export default ProjectsPreview;

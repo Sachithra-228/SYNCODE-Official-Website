@@ -5,6 +5,7 @@ import emailjs from "@emailjs/browser";
 import { Link } from "react-router-dom";
 import Footer from "@/components/layout/Footer";
 import { business, formatHours, localityLine } from "@/lib/site";
+import { RollText } from "@/components/ui/roll-text";
 
 const WhatsAppIcon = ({ size = 20 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
@@ -298,7 +299,7 @@ const Contact = () => {
                           </span>
                         ) : (
                           <span className="flex items-center justify-center gap-2">
-                            Send Message <Send size={18} />
+                            <RollText>Send Message</RollText> <Send size={18} />
                           </span>
                         )}
                       </button>

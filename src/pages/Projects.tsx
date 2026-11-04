@@ -6,6 +6,8 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Footer from "@/components/layout/Footer";
+import { RollText } from "@/components/ui/roll-text";
+import { Crosshairs } from "@/components/ui/crosshairs";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -152,9 +154,9 @@ const VisitButton = ({ project }: { project: Project }) => (
     href={project.url}
     target="_blank"
     rel="noopener noreferrer"
-    className="group/btn inline-flex items-center gap-2 rounded-full bg-foreground px-6 py-3 text-sm font-semibold text-background transition-transform duration-300 hover:scale-105"
+    className="roll-host group/btn inline-flex items-center gap-2 rounded-full bg-foreground px-6 py-3 text-sm font-semibold text-background transition-transform duration-300 hover:scale-105"
   >
-    Visit live site
+    <RollText>Visit live site</RollText>
     <ArrowUpRight
       size={16}
       className="transition-transform duration-300 group-hover/btn:-translate-y-0.5 group-hover/btn:translate-x-0.5"
@@ -383,7 +385,7 @@ const HorizontalGallery = () => {
             <span className="gradient-text">could be next.</span>
           </h2>
           <Link to="/contact" className="btn-primary mt-10">
-            Start Your Project
+            <RollText>Start Your Project</RollText>
             <ArrowUpRight size={18} className="ml-2" />
           </Link>
         </div>
@@ -446,7 +448,7 @@ const StackedGallery = () => (
         Your project <span className="gradient-text">could be next.</span>
       </h2>
       <Link to="/contact" className="btn-primary mt-8">
-        Start Your Project
+        <RollText>Start Your Project</RollText>
         <ArrowUpRight size={18} className="ml-2" />
       </Link>
     </div>
@@ -468,6 +470,7 @@ const Projects = () => {
             aria-hidden="true"
             className="pointer-events-none absolute left-1/2 top-0 h-[700px] w-[900px] -translate-x-1/2 rounded-full bg-gradient-radial from-foreground/5 to-transparent blur-3xl"
           />
+          <Crosshairs className="bottom-6" />
           <div className="container-wide relative">
             <motion.span
               initial={{ opacity: 0, y: 20 }}

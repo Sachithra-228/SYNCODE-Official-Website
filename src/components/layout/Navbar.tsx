@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { ArrowUpRight, Menu, MessageCircle, X } from "lucide-react";
 import logo from "@/assets/syncode-logo.png";
+import { RollText } from "@/components/ui/roll-text";
 
 const navItems = [
   { name: "Home", path: "/" },
@@ -35,7 +36,7 @@ export const Navbar = () => {
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
-        className="fixed top-2 md:top-3 left-1/2 -trtellanslate-x-1/2 z-50 w-auto"
+        className="fixed top-2 right-3 z-50 w-auto md:top-3 md:right-6"
       >
         <nav
           className={`
@@ -67,7 +68,7 @@ export const Navbar = () => {
                 <Link
                   to={item.path}
                   className={`
-                    relative px-5 py-2.5 text-sm font-medium rounded-full
+                    roll-host relative px-5 py-2.5 text-sm font-medium rounded-full
                     transition-all duration-300 ease-smooth
                     ${location.pathname === item.path 
                       ? "text-foreground" 
@@ -82,7 +83,7 @@ export const Navbar = () => {
                       transition={{ type: "spring", stiffness: 300, damping: 30 }}
                     />
                   )}
-                  <span className="relative z-10">{item.name}</span>
+                  <RollText className="relative z-10">{item.name}</RollText>
                 </Link>
               </li>
             ))}
@@ -91,11 +92,25 @@ export const Navbar = () => {
           {/* CTA Button */}
           <Link
             to="/contact"
-            className="hidden md:flex ml-3 px-6 py-2.5 bg-foreground text-background 
-                       text-sm font-semibold rounded-full transition-all duration-300
-                       hover:scale-105 hover:shadow-glow"
+            className="roll-host group/talk hidden md:flex items-center gap-3 ml-3 py-1.5 pl-5 pr-1.5
+                       bg-foreground text-background text-sm font-semibold rounded-full
+                       transition-all duration-500 ease-out hover:pl-6 hover:shadow-glow"
           >
-            Contact Us
+            <RollText>Let's talk</RollText>
+            <span
+              aria-hidden="true"
+              className="relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-background text-foreground
+                         transition-transform duration-500 ease-out group-hover/talk:scale-110"
+            >
+              <MessageCircle
+                size={15}
+                className="absolute transition-all duration-500 ease-out group-hover/talk:-translate-y-8 group-hover/talk:opacity-0"
+              />
+              <ArrowUpRight
+                size={16}
+                className="absolute translate-y-8 opacity-0 transition-all duration-500 ease-out group-hover/talk:translate-y-0 group-hover/talk:opacity-100"
+              />
+            </span>
           </Link>
 
           {/* Mobile Menu Toggle */}
@@ -161,7 +176,7 @@ export const Navbar = () => {
                   to="/contact"
                   className="btn-primary text-lg"
                 >
-                  Contact Us
+                  <RollText>Let's talk</RollText>
                 </Link>
               </motion.div>
             </motion.nav>

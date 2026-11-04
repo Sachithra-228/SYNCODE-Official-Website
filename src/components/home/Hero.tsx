@@ -1,6 +1,8 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowRight, Play } from "lucide-react";
+import { RollText } from "@/components/ui/roll-text";
+import { Crosshairs } from "@/components/ui/crosshairs";
 
 export const Hero = () => {
   return (
@@ -23,6 +25,8 @@ export const Hero = () => {
         {/* Noise texture */}
         <div className="absolute inset-0 noise" />
       </div>
+
+      <Crosshairs className="bottom-[14%]" />
 
       {/* Content */}
       <div className="relative z-10 container-wide text-center px-4">
@@ -76,7 +80,7 @@ export const Hero = () => {
               to="/projects"
               className="group btn-primary text-base"
             >
-              View Our Work
+              <RollText>View Our Work</RollText>
               <ArrowRight 
                 size={18} 
                 className="ml-2 group-hover:translate-x-1 transition-transform duration-300" 
@@ -87,7 +91,7 @@ export const Hero = () => {
               className="btn-secondary text-base group"
             >
               <Play size={16} className="mr-2" />
-              Explore Services
+              <RollText>Explore Services</RollText>
             </Link>
           </motion.div>
         </motion.div>

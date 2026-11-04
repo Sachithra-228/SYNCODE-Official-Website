@@ -6,6 +6,8 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowUp, ArrowUpRight, Facebook, Instagram, Linkedin, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { addressLine, business } from "@/lib/site";
+import { scrollToTop } from "@/lib/smooth-scroll";
+import { RollText } from "@/components/ui/roll-text";
 
 // Register only in the browser: components also render in Node during pre-rendering.
 if (typeof window !== "undefined") {
@@ -44,19 +46,12 @@ const STYLES = `
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
 }
-@keyframes footer-heartbeat {
-  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 5px hsl(var(--destructive) / 0.5)); }
-  15%, 45% { transform: scale(1.2); filter: drop-shadow(0 0 10px hsl(var(--destructive) / 0.8)); }
-  30% { transform: scale(1); }
-}
 .animate-footer-breathe { animation: footer-breathe 8s ease-in-out infinite alternate; }
 .animate-footer-scroll-marquee { animation: footer-scroll-marquee 40s linear infinite; }
-.animate-footer-heartbeat { animation: footer-heartbeat 2s cubic-bezier(0.25, 1, 0.5, 1) infinite; }
 
 @media (prefers-reduced-motion: reduce) {
   .animate-footer-breathe,
-  .animate-footer-scroll-marquee,
-  .animate-footer-heartbeat { animation: none; }
+  .animate-footer-scroll-marquee { animation: none; }
 }
 
 .footer-bg-grid {
@@ -218,6 +213,8 @@ const socialLinks = [
   { name: "TikTok", href: business.social.tiktok, icon: TikTokIcon },
 ];
 
+const HEADLINE = "Let's build together.";
+
 const MarqueeItem = () => (
   <div className="flex items-center space-x-12 px-6" aria-hidden="true">
     {marqueeWords.map((word, i) => (
@@ -281,9 +278,7 @@ export function CinematicFooter() {
     return () => ctx.revert();
   }, []);
 
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? "auto" : "smooth" });
-  };
+  const backToTop = () => scrollToTop(!prefersReducedMotion());
 
   const year = new Date().getFullYear();
 
@@ -323,9 +318,32 @@ export function CinematicFooter() {
           <div className="relative z-10 mx-auto mt-24 flex w-full max-w-5xl flex-1 flex-col items-center justify-center px-6">
             <h2
               ref={headingRef}
-              className="footer-text-glow mb-8 text-center text-5xl font-black tracking-tighter md:mb-12 md:text-8xl"
+              className="wave-host mb-8 cursor-default text-center text-5xl font-black tracking-tighter md:mb-12 md:text-8xl"
             >
-              Let's build together.
+              <span className="sr-only">{HEADLINE}</span>
+              <span aria-hidden="true">
+                {HEADLINE.split(" ").map((word, w, words) => {
+                  const offset = words.slice(0, w).join(" ").length + (w ? 1 : 0);
+                  return (
+                    <React.Fragment key={w}>
+                      <span className="inline-block whitespace-nowrap">
+                        {Array.from(word).map((char, i) => (
+                          // Each letter carries the glow, since background-clip text
+                          // does not reach into transformed children.
+                          <span
+                            key={i}
+                            className="wave-char footer-text-glow"
+                            style={{ ["--i" as string]: offset + i }}
+                          >
+                            {char}
+                          </span>
+                        ))}
+                      </span>
+                      {w < words.length - 1 && " "}
+                    </React.Fragment>
+                  );
+                })}
+              </span>
             </h2>
 
             <div ref={linksRef} className="flex w-full flex-col items-center gap-5 md:gap-6">
@@ -334,9 +352,9 @@ export function CinematicFooter() {
                 <MagneticButton
                   as={Link}
                   to="/contact"
-                  className="footer-glass-pill group flex items-center gap-3 rounded-full px-8 py-4 text-sm font-bold text-foreground md:px-10 md:py-5 md:text-base"
+                  className="footer-glass-pill roll-host group flex items-center gap-3 rounded-full px-8 py-4 text-sm font-bold text-foreground md:px-10 md:py-5 md:text-base"
                 >
-                  Start a Project
+                  <RollText>Start a Project</RollText>
                   <ArrowUpRight className="h-5 w-5 text-muted-foreground transition-colors group-hover:text-foreground" />
                 </MagneticButton>
                 <MagneticButton
@@ -344,10 +362,10 @@ export function CinematicFooter() {
                   href={business.whatsappHref}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="footer-glass-pill group flex items-center gap-3 rounded-full px-8 py-4 text-sm font-bold text-foreground md:px-10 md:py-5 md:text-base"
+                  className="footer-glass-pill roll-host group flex items-center gap-3 rounded-full px-8 py-4 text-sm font-bold text-foreground md:px-10 md:py-5 md:text-base"
                 >
                   <MessageCircle className="h-5 w-5 text-muted-foreground transition-colors group-hover:text-foreground" />
-                  WhatsApp Us
+                  <RollText>WhatsApp Us</RollText>
                 </MagneticButton>
               </div>
 
@@ -358,9 +376,9 @@ export function CinematicFooter() {
                     key={link.path}
                     as={Link}
                     to={link.path}
-                    className="footer-glass-pill rounded-full px-4 py-2 text-xs font-medium text-muted-foreground hover:text-foreground md:px-6 md:py-3 md:text-sm"
+                    className="footer-glass-pill roll-host rounded-full px-4 py-2 text-xs font-medium text-muted-foreground hover:text-foreground md:px-6 md:py-3 md:text-sm"
                   >
-                    {link.name}
+                    <RollText>{link.name}</RollText>
                   </MagneticButton>
                 ))}
               </nav>
@@ -406,22 +424,10 @@ export function CinematicFooter() {
               © {year} {business.name}. All rights reserved.
             </div>
 
-            <div className="footer-glass-pill order-1 flex cursor-default items-center gap-2 rounded-full border-border/50 px-6 py-3 md:order-2">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground md:text-xs">
-                Crafted with
-              </span>
-              <span className="animate-footer-heartbeat text-sm text-destructive md:text-base" aria-label="love">
-                ❤
-              </span>
-              <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground md:text-xs">
-                in Sri Lanka
-              </span>
-            </div>
-
             <MagneticButton
               as="button"
               type="button"
-              onClick={scrollToTop}
+              onClick={backToTop}
               aria-label="Back to top"
               className="footer-glass-pill group order-3 hidden h-12 w-12 items-center justify-center rounded-full text-muted-foreground hover:text-foreground md:flex"
             >

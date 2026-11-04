@@ -2,6 +2,7 @@ import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, ArrowUpRight, ArrowDown, CheckCircle, Code, Smartphone, ShoppingCart, Brain, Palette, Server } from "lucide-react";
 import Footer from "@/components/layout/Footer";
+import { RollText } from "@/components/ui/roll-text";
 
 const servicesData = {
   "custom-software": {
@@ -213,7 +214,7 @@ const ServiceDetail = () => {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-4xl font-bold mb-4">Service Not Found</h1>
-          <Link to="/services" className="btn-primary">View All Services</Link>
+          <Link to="/services" className="btn-primary"><RollText>View All Services</RollText></Link>
         </div>
       </div>
     );
@@ -453,7 +454,7 @@ const ServiceDetail = () => {
                 Let's discuss your project requirements and explore how we can help bring your vision to life.
               </p>
               <Link to="/contact" className="btn-primary">
-                Start a Conversation <ArrowUpRight size={18} className="ml-2" />
+                <RollText>Start a Conversation</RollText> <ArrowUpRight size={18} className="ml-2" />
               </Link>
             </motion.div>
           </div>

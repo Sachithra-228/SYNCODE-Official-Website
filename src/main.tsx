@@ -3,6 +3,7 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./App.tsx";
 import { normalizePath } from "./lib/site";
 import "./index.css";
+import "./styles/motion.css";
 
 const container = document.getElementById("root")!;
 const app = (

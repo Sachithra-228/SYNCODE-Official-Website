@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from "react";
+import { useRef, useState, type MouseEvent, type ReactNode } from "react";
 import {
   motion,
+  useMotionTemplate,
   useMotionValue,
   useReducedMotion,
   useScroll,
@@ -8,16 +9,17 @@ import {
   useTransform,
   type MotionValue,
 } from "framer-motion";
-import { ArrowRight, ArrowUpRight, Code2, Lightbulb, MapPin, Rocket } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Code2, Lightbulb, Rocket } from "lucide-react";
+import StudioClock from "@/components/home/StudioClock";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { business } from "@/lib/site";
 import sachithraAvatar from "@/assets/team/Sachithra.webp";
 import praveenAvatar from "@/assets/team/Praveen.webp";
 import pasanAvatar from "@/assets/team/Pasan.webp";
 import vishwaAvatar from "@/assets/team/Vishwa.webp";
 import kumodhAvatar from "@/assets/team/Kumodh.webp";
 import anukAvatar from "@/assets/team/Anuk.webp";
+import { Crosshairs } from "@/components/ui/crosshairs";
 
 // ---------------------------------------------------------------------------
 // Content
@@ -88,19 +90,16 @@ const Word = ({
 
 const ScrollLitStatement = () => {
   const ref = useRef<HTMLParagraphElement>(null);
-  const reducedMotion = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start 0.85", "end 0.5"] });
   const words = statement.split(" ");
 
-  // The ref stays on the paragraph in both branches: useScroll needs its target mounted.
+  // Only opacity changes (no movement), so this runs for reduced-motion visitors too.
   return (
     <p
       ref={ref}
       className="text-[clamp(1.75rem,3.6vw,3.25rem)] font-semibold leading-[1.15] tracking-tight"
     >
-      {reducedMotion
-        ? statement
-        : words.map((word, i) => (
+      {words.map((word, i) => (
         <Word
           key={i}
           progress={scrollYProgress}
@@ -109,7 +108,7 @@ const ScrollLitStatement = () => {
         >
           {word}
         </Word>
-          ))}
+      ))}
     </p>
   );
 };
@@ -267,118 +266,6 @@ const TeamCard = () => {
 };
 
 // ---------------------------------------------------------------------------
-// Live studio card: local time in Sri Lanka and whether the studio is open
-// ---------------------------------------------------------------------------
-const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-
-const colomboNow = () => {
-  const parts = new Intl.DateTimeFormat("en-GB", {
-    timeZone: "Asia/Colombo",
-    weekday: "long",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: false,
-  }).formatToParts(new Date());
-  const get = (type: string) => parts.find((p) => p.type === type)?.value ?? "";
-  return {
-    weekday: get("weekday"),
-    hh: get("hour") === "24" ? "00" : get("hour"),
-    mm: get("minute"),
-    ss: get("second"),
-  };
-};
-
-const studioStatus = (weekday: string, hh: string, mm: string) => {
-  const minutes = Number(hh) * 60 + Number(mm);
-  const toMin = (t: string) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5));
-  const today = business.hours.find((h) => h.days.includes(weekday));
-  if (today?.opens && today.closes && minutes >= toMin(today.opens) && minutes < toMin(today.closes)) {
-    return { open: true, text: `Open now, until ${today.closes}` };
-  }
-  // Next opening time
-  const dayIndex = WEEKDAYS.indexOf(weekday);
-  for (let offset = 0; offset < 7; offset++) {
-    const day = WEEKDAYS[(dayIndex + offset) % 7];
-    const h = business.hours.find((x) => x.days.includes(day));
-    if (!h?.opens) continue;
-    if (offset === 0 && minutes >= toMin(h.opens)) continue;
-    const when = offset === 0 ? "today" : offset === 1 ? "tomorrow" : day;
-    return { open: false, text: `Closed. Opens ${when} at ${h.opens}` };
-  }
-  return { open: false, text: "Closed" };
-};
-
-const StudioCard = () => {
-  // Rendered only in the browser, so the pre-rendered page has no stale time.
-  const [now, setNow] = useState<ReturnType<typeof colomboNow> | null>(null);
-
-  useEffect(() => {
-    setNow(colomboNow());
-    const id = window.setInterval(() => setNow(colomboNow()), 1000);
-    return () => window.clearInterval(id);
-  }, []);
-
-  const status = now ? studioStatus(now.weekday, now.hh, now.mm) : null;
-
-  return (
-    <InteractiveCard tilt={false} className="h-full p-7 md:p-10">
-      <div className="flex h-full flex-col justify-between gap-10">
-        <div className="flex items-center justify-between gap-4">
-          <span className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
-            The Studio
-          </span>
-          <span className="flex items-center gap-2 text-xs text-muted-foreground">
-            <span className="relative flex h-2.5 w-2.5">
-              {status?.open && (
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
-              )}
-              <span
-                className={cn(
-                  "relative inline-flex h-2.5 w-2.5 rounded-full",
-                  status ? (status.open ? "bg-emerald-400" : "bg-white/30") : "bg-white/20"
-                )}
-              />
-            </span>
-            {status?.text ?? "Mon–Fri 9:00–18:00, Sat 9:00–13:00"}
-          </span>
-        </div>
-
-        <div>
-          <p className="text-xs uppercase tracking-widest text-muted-foreground">Local time</p>
-          <p
-            className="mt-2 font-mono text-[clamp(3rem,6vw,4.75rem)] font-bold leading-none tracking-tighter tabular-nums"
-            aria-label={now ? `Local time in Sri Lanka ${now.hh}:${now.mm}` : undefined}
-          >
-            {now ? now.hh : "--"}
-            <span className="animate-pulse text-foreground/40">:</span>
-            {now ? now.mm : "--"}
-            <span className="ml-2 align-top text-[0.35em] text-muted-foreground">{now ? now.ss : "--"}</span>
-          </p>
-        </div>
-
-        <a
-          href={business.mapsUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="group/map flex items-start gap-3 text-sm text-muted-foreground transition-colors hover:text-foreground"
-        >
-          <MapPin size={18} className="mt-0.5 shrink-0" />
-          <span>
-            {business.address.locality}, {business.address.country}
-            <span className="block text-xs">Open in Google Maps</span>
-          </span>
-          <ArrowUpRight
-            size={16}
-            className="ml-auto mt-0.5 transition-transform duration-300 group-hover/map:-translate-y-0.5 group-hover/map:translate-x-0.5"
-          />
-        </a>
-      </div>
-    </InteractiveCard>
-  );
-};
-
-// ---------------------------------------------------------------------------
 // Section
 // ---------------------------------------------------------------------------
 const reveal = {
@@ -387,9 +274,33 @@ const reveal = {
   viewport: { once: true, amount: 0.2 },
 };
 
+// The three principle cards rise from below, one after another
+const rise = {
+  hidden: { opacity: 0, y: 160, rotateX: -22 },
+  show: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    rotateX: 0,
+    transition: { type: "spring" as const, stiffness: 70, damping: 16, delay: i * 0.18 },
+  }),
+};
+
 export const CompanyOverview = () => {
+  const sectionRef = useRef<HTMLElement>(null);
+
+  // Curtain reveal: the panel opens from a rounded inset to full width as it scrolls in
+  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "start 0.15"] });
+  const insetX = useTransform(scrollYProgress, [0, 1], [6, 0]);
+  const insetTop = useTransform(scrollYProgress, [0, 1], [10, 0]);
+  const radius = useTransform(scrollYProgress, [0, 1], [56, 0]);
+  const clipPath = useMotionTemplate`inset(${insetTop}% ${insetX}% 0% ${insetX}% round ${radius}px)`;
+
   return (
-    <section className="section-padding relative overflow-hidden bg-background">
+    <section ref={sectionRef} className="relative bg-background">
+      <motion.div
+        style={{ clipPath }}
+        className="section-padding relative overflow-hidden bg-[hsl(0_0%_6%)]"
+      >
       {/* Ambient light and grid */}
       <div
         aria-hidden="true"
@@ -407,6 +318,8 @@ export const CompanyOverview = () => {
         }}
       />
 
+      <Crosshairs className="top-10 md:top-14" />
+
       <div className="container-wide relative z-10">
         {/* Statement */}
         <div className="grid gap-8 lg:grid-cols-12 lg:gap-12">
@@ -423,19 +336,37 @@ export const CompanyOverview = () => {
         </div>
 
         {/* Bento grid */}
-        <div className="mt-16 grid gap-4 md:mt-24 md:gap-5 lg:grid-cols-12">
-          <motion.div {...reveal} transition={{ duration: 0.7 }} className="lg:col-span-7">
+        <div className="mt-16 grid gap-4 md:mt-24 md:gap-5 lg:grid-cols-12" style={{ perspective: 1400 }}>
+          <motion.div
+            initial={{ opacity: 0, x: -80 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.25 }}
+            transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+            className="lg:col-span-7"
+          >
             <TeamCard />
           </motion.div>
-          <motion.div {...reveal} transition={{ duration: 0.7, delay: 0.1 }} className="lg:col-span-5">
-            <StudioCard />
+          <motion.div
+            initial={{ opacity: 0, x: 80 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.25 }}
+            transition={{ duration: 0.9, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+            className="lg:col-span-5"
+          >
+            <InteractiveCard className="h-full p-7 md:p-10">
+              <StudioClock />
+            </InteractiveCard>
           </motion.div>
 
           {principles.map((p, i) => (
             <motion.div
               key={p.title}
-              {...reveal}
-              transition={{ duration: 0.6, delay: 0.1 * i }}
+              custom={i}
+              variants={rise}
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true, amount: 0.3 }}
+              style={{ transformOrigin: "50% 100%" }}
               className="md:col-span-1 lg:col-span-4"
             >
               <InteractiveCard className="h-full p-7 md:p-8">
@@ -472,6 +403,7 @@ export const CompanyOverview = () => {
           </Link>
         </motion.div>
       </div>
+      </motion.div>
     </section>
   );
 };

@@ -11,6 +11,7 @@ import vishwaAvatar from "@/assets/team/Vishwa.webp";
 import kumodhAvatar from "@/assets/team/Kumodh.webp";
 import anukAvatar from "@/assets/team/Anuk.webp";
 import placeholderAvatar from "@/assets/syncode-logo-round.png";
+import { RollText } from "@/components/ui/roll-text";
 
 const stats = [
   { value: "175+", label: "Projects Delivered" },
@@ -354,7 +355,7 @@ const About = () => {
                 Let&apos;s start a conversation.
               </p>
               <Link to="/contact" className="btn-primary">
-                Get in Touch
+                <RollText>Get in Touch</RollText>
                 <ArrowUpRight size={18} className="ml-2" />
               </Link>
             </motion.div>
