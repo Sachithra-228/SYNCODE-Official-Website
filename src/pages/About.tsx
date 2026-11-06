@@ -53,7 +53,7 @@ const teamGroups: TeamGroup[] = [
           "Technical leadership",
         ],
         avatar: sachithraAvatar,
-        crop: [0.24, 0, 0.5, 0.475],
+        crop: [0.29, 0, 0.4, 0.38],
       },
     ],
   },
@@ -209,7 +209,7 @@ const About = () => (
       <AboutHero />
       <StorySection text={story} />
       <ValuesSection values={values} />
-      <TeamShowcase groups={teamGroups} />
+      <TeamShowcase groups={teamGroups} ceoFullName="Sachithra Wijesinghe" />
       <AboutCTA />
     </main>
     <Footer />
