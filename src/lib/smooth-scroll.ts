@@ -32,6 +32,16 @@ export const startSmoothScroll = () => {
   };
 };
 
+/** Glide to a page position, through Lenis when it is running. */
+export const scrollToY = (y: number) => {
+  if (lenis) {
+    lenis.scrollTo(y, { duration: 1.4 });
+  } else {
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.scrollTo({ top: y, behavior: reduced ? "auto" : "smooth" });
+  }
+};
+
 /** Jump or glide to the top, through Lenis when it is running. */
 export const scrollToTop = (smooth = true) => {
   if (lenis) {

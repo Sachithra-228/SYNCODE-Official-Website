@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowUpRight, ArrowDown, Code, Smartphone, ShoppingCart, Brain, Palette, Server } from "lucide-react";
 import Footer from "@/components/layout/Footer";
+import ServiceStack, { type Service } from "@/components/services/ServiceStack";
 import modelSrc from "@/assets/texture_cube_-_free_download.glb";
 
 declare global {
@@ -55,7 +56,7 @@ const ModelViewer = () => {
   );
 };
 
-const services = [
+const services: Service[] = [
   {
     icon: Code,
     title: "Custom Software Development",
@@ -161,81 +162,10 @@ const Services = () => {
           </div>
         </section>
 
-        <section className="pb-10">
-          <div className="container-wide">
-            <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              viewport={{ once: true }}
-              className="text-center"
-            >
-              <h2 className="text-display-sm font-semibold text-foreground">Explore Our Services</h2>
-            </motion.div>
-          </div>
-        </section>
+        {/* Services: stacking cards */}
+        <ServiceStack services={services} />
 
-        {/* Services Grid */}
-        <section id="services-grid" className="pb-32">
-          <div className="container-wide">
-            <div className="grid md:grid-cols-2 gap-8">
-              {services.map((service, index) => (
-                <motion.div
-                  key={service.title}
-                  initial={{ opacity: 0, y: 40 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  viewport={{ once: true }}
-                >
-                  <Link to={service.path} className="group block h-full">
-                    <div className="h-full rounded-3xl bg-card border border-border/50 
-                                    card-float hover:border-foreground/30 transition-all duration-500 overflow-hidden">
-                      {/* Image */}
-                      <div className="relative h-48 overflow-hidden">
-                        <img 
-                          src={service.image} 
-                          alt={service.title}
-                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-card via-card/20 to-transparent" />
-                        <div className="absolute top-4 left-4 w-12 h-12 rounded-xl bg-background/90 backdrop-blur-sm flex items-center justify-center">
-                          <service.icon size={24} className="text-foreground" />
-                        </div>
-                        <ArrowUpRight 
-                          size={24} 
-                          className="absolute top-4 right-4 opacity-0 -translate-y-2 translate-x-2 
-                                     group-hover:opacity-100 group-hover:translate-y-0 group-hover:translate-x-0 
-                                     transition-all duration-300 text-white"
-                        />
-                      </div>
-
-                      {/* Content */}
-                      <div className="p-6 md:p-8">
-                        <h2 className="text-2xl font-semibold mb-3">{service.title}</h2>
-                        <p className="text-muted-foreground leading-relaxed mb-5">
-                          {service.description}
-                        </p>
-
-                        {/* Features */}
-                        <div className="flex flex-wrap gap-2">
-                          {service.features.map((feature) => (
-                            <span
-                              key={feature}
-                              className="px-3 py-1.5 text-xs font-medium text-foreground/70 
-                                         bg-foreground/5 rounded-full"
-                            >
-                              {feature}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
+        <div className="h-24 md:h-32" aria-hidden="true" />
 
         {/* CTA Section */}
         <section className="py-24 bg-white border-t border-border">
