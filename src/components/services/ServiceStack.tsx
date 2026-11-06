@@ -193,16 +193,18 @@ const StackHeading = ({ services, onJump }: { services: Service[]; onJump: (i: n
         </motion.span>
         <h2 className="text-[clamp(2.5rem,7vw,6rem)] font-black leading-[0.95] tracking-tighter">
           {["Explore", "Our", "Services"].map((word, i) => (
-            <span key={word} className="mr-[0.22em] inline-block overflow-hidden pb-[0.08em] align-bottom">
-              <motion.span
-                className={cn("inline-block", i === 2 && "gradient-text")}
-                initial={{ y: "110%", rotate: 4 }}
-                whileInView={{ y: "0%", rotate: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.9, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
-              >
-                {word}
-              </motion.span>
+            <span key={word}>
+              <span className="inline-block overflow-hidden pb-[0.08em] align-bottom">
+                <motion.span
+                  className={cn("inline-block", i === 2 && "gradient-text")}
+                  initial={{ y: "110%", rotate: 4 }}
+                  whileInView={{ y: "0%", rotate: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.9, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  {word}
+                </motion.span>
+              </span>{" "}
             </span>
           ))}
         </h2>

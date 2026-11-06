@@ -492,6 +492,8 @@ const Projects = () => {
                   >
                     {word}
                   </motion.span>
+                  {/* Space for search engines and screen readers; the words sit on separate lines */}
+                  {i === 0 && <span className="sr-only"> </span>}
                 </span>
               ))}
             </h1>

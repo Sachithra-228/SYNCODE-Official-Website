@@ -1,8 +1,8 @@
 import { useParams, Link } from "react-router-dom";
-import { motion } from "framer-motion";
-import { ArrowLeft, ArrowUpRight, ArrowDown, CheckCircle, Code, Smartphone, ShoppingCart, Brain, Palette, Server } from "lucide-react";
+import { Code, Smartphone, ShoppingCart, Brain, Palette, Server } from "lucide-react";
 import Footer from "@/components/layout/Footer";
 import { RollText } from "@/components/ui/roll-text";
+import ServiceDetailView, { type ServiceDetailData } from "@/components/services/ServiceDetailView";
 
 const servicesData = {
   "custom-software": {
@@ -205,11 +205,13 @@ const servicesData = {
   },
 };
 
+const slugs = Object.keys(servicesData) as (keyof typeof servicesData)[];
+
 const ServiceDetail = () => {
   const { slug } = useParams<{ slug: string }>();
-  const service = slug ? servicesData[slug as keyof typeof servicesData] : null;
+  const index = slugs.indexOf(slug as keyof typeof servicesData);
 
-  if (!service) {
+  if (index < 0) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -220,245 +222,20 @@ const ServiceDetail = () => {
     );
   }
 
-  const IconComponent = service.icon;
+  const service: ServiceDetailData = servicesData[slugs[index]];
+  const nextSlug = slugs[(index + 1) % slugs.length];
 
   return (
     <div className="min-h-screen bg-background">
       <main>
-        {/* Hero Section with Image */}
-        <section className="relative min-h-[92vh] w-full overflow-hidden">
-          <motion.div 
-            initial={{ opacity: 0, y: 40 }} 
-            animate={{ opacity: 1, y: 0 }} 
-            transition={{ duration: 0.8, delay: 0.1 }}
-            className="absolute inset-0"
-          >
-            <img 
-              src={service.heroImage} 
-              alt={service.title}
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/25 to-transparent" />
-          </motion.div>
-
-          <div className="absolute inset-0">
-            <div className="container-wide h-full flex flex-col justify-start gap-40 py-10 md:py-14">
-              <div className="flex justify-start mt-6">
-                <Link 
-                  to="/services" 
-                  className="inline-flex items-center gap-2 rounded-full bg-black/55 px-4 py-2 text-white backdrop-blur-md transition hover:bg-black/70"
-                >
-                  <ArrowLeft size={18} /> Back to Services
-                </Link>
-              </div>
-
-              <div className="pb-2 md:pb-4">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="w-14 h-14 rounded-2xl bg-black/80 backdrop-blur-sm flex items-center justify-center text-white">
-                    <IconComponent size={28} />
-                  </div>
-                </div>
-                <h1 className="text-display-lg md:text-display-xl text-white mb-4">{service.title}</h1>
-                <p className="text-lg md:text-xl text-white/85 max-w-2xl leading-relaxed">{service.subtitle}</p>
-              </div>
-            </div>
-          </div>
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1, y: [0, 12, 0] }}
-            transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut", delay: 0.4 }}
-            className="absolute bottom-8 md:bottom-10 left-0 right-0 flex justify-center"
-          >
-            <a
-              href="#service-detail-content"
-              className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-black/65 text-white backdrop-blur-sm shadow-lg transition hover:-translate-y-1 hover:bg-black"
-              aria-label="Scroll to details"
-            >
-              <ArrowDown size={22} />
-            </a>
-          </motion.div>
-        </section>
-
-        {/* Description Section */}
-        <section id="service-detail-content" className="py-16 md:py-24">
-          <div className="container-wide">
-            <div className="grid lg:grid-cols-5 gap-12 items-start">
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-                viewport={{ once: true }}
-                className="lg:col-span-3"
-              >
-                <h2 className="text-display-sm mb-6">Overview</h2>
-                <p className="text-lg text-muted-foreground leading-relaxed mb-6">
-                  {service.description}
-                </p>
-                {service.extendedDescription && (
-                  <p className="text-base text-muted-foreground/80 leading-relaxed">
-                    {service.extendedDescription}
-                  </p>
-                )}
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.15 }}
-                viewport={{ once: true }}
-                className="lg:col-span-2 space-y-4"
-              >
-                {service.highlights?.map((highlight, index) => (
-                  <div
-                    key={index}
-                    className="group p-5 rounded-2xl bg-card border border-border/50 transition-all duration-300 hover:border-foreground/30 hover:shadow-lg hover:scale-[1.02] cursor-default"
-                  >
-                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1 group-hover:text-foreground/70 transition-colors">
-                      {highlight.label}
-                    </p>
-                    <p className="text-lg font-semibold text-foreground">
-                      {highlight.value}
-                    </p>
-                  </div>
-                ))}
-              </motion.div>
-            </div>
-          </div>
-        </section>
-
-        {/* Features Grid */}
-        <section className="py-16 md:py-24 bg-white">
-          <div className="container-wide">
-            <motion.h2 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              viewport={{ once: true }}
-              className="text-display-sm mb-12 text-black"
-            >
-              What We Deliver
-            </motion.h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {service.features.map((feature, index) => (
-                <motion.div 
-                  key={feature.title} 
-                  initial={{ opacity: 0, y: 20 }} 
-                  whileInView={{ opacity: 1, y: 0 }} 
-                  transition={{ duration: 0.5, delay: index * 0.1 }} 
-                  viewport={{ once: true }} 
-                  className="group p-6 md:p-8 rounded-2xl bg-gray-50 border border-gray-200 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] hover:border-black hover:bg-black cursor-default"
-                >
-                  <div className="flex items-start gap-4 mb-3">
-                    <CheckCircle size={22} className="text-black group-hover:text-white mt-0.5 flex-shrink-0 transition-colors duration-300" />
-                    <h3 className="text-lg font-semibold text-black group-hover:text-white transition-colors duration-300">{feature.title}</h3>
-                  </div>
-                  <p className="text-black/70 group-hover:text-white/80 text-sm leading-relaxed pl-9 transition-colors duration-300">
-                    {feature.description}
-                  </p>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Gallery Section */}
-        <section className="py-16 md:py-24">
-          <div className="container-wide">
-            <motion.h2 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              viewport={{ once: true }}
-              className="text-display-sm mb-12"
-            >
-              Our Work
-            </motion.h2>
-            <div className="grid md:grid-cols-3 gap-6">
-              {service.gallery.map((image, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  viewport={{ once: true }}
-                  className="group relative aspect-[4/3] rounded-2xl overflow-hidden"
-                >
-                  <img 
-                    src={image} 
-                    alt={`${service.title} example ${index + 1}`}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/10 transition-colors duration-300" />
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Process Section */}
-        <section className="py-24 md:py-32 bg-white">
-          <div className="container-wide">
-            <motion.h2 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              viewport={{ once: true }}
-              className="text-display-sm mb-16 text-center text-black"
-            >
-              Our Process
-            </motion.h2>
-            <div className="grid md:grid-cols-5 gap-6">
-              {service.process.map((item, index) => (
-                <motion.div 
-                  key={item.step} 
-                  initial={{ opacity: 0, y: 30 }} 
-                  whileInView={{ opacity: 1, y: 0 }} 
-                  transition={{ duration: 0.4, delay: index * 0.1 }} 
-                  viewport={{ once: true }} 
-                  className="group relative text-center"
-                >
-                  <div className="w-12 h-12 rounded-full border-2 border-gray-400 bg-transparent text-black flex items-center justify-center text-lg font-bold mx-auto mb-4 transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg group-hover:border-black">
-                    {index + 1}
-                  </div>
-                  <h3 className="font-semibold mb-2 text-black">{item.step}</h3>
-                  
-                  {/* Hover popup with description */}
-                  <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-56 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-20 pointer-events-none">
-                    <div className="bg-black text-white text-sm leading-relaxed p-4 rounded-xl shadow-xl">
-                      <p>{item.description}</p>
-                      <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-black rotate-45 rounded-sm" />
-                    </div>
-                  </div>
-                  
-                  {index < service.process.length - 1 && (
-                    <div className="hidden md:block absolute top-6 left-[60%] w-[80%] h-px bg-gray-300" />
-                  )}
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* CTA Section */}
-        <section className="py-24">
-          <div className="container-wide text-center">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-            >
-              <h2 className="text-display-md mb-6">Ready to Get Started?</h2>
-              <p className="text-lg text-muted-foreground mb-8 max-w-xl mx-auto">
-                Let's discuss your project requirements and explore how we can help bring your vision to life.
-              </p>
-              <Link to="/contact" className="btn-primary">
-                <RollText>Start a Conversation</RollText> <ArrowUpRight size={18} className="ml-2" />
-              </Link>
-            </motion.div>
-          </div>
-        </section>
+        {/* Keyed by slug so moving to the next service starts each section fresh */}
+        <ServiceDetailView
+          key={slug}
+          service={service}
+          index={index}
+          total={slugs.length}
+          next={{ slug: nextSlug, data: servicesData[nextSlug] }}
+        />
       </main>
       <Footer />
     </div>
