@@ -3,11 +3,13 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { ArrowDown, ArrowRight, ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Footer from "@/components/layout/Footer";
 import { RollText } from "@/components/ui/roll-text";
 import { Crosshairs } from "@/components/ui/crosshairs";
+import WorkWindow from "@/components/projects/WorkWindow";
+import ToolPlayground from "@/components/projects/ToolPlayground";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -86,7 +88,6 @@ const projects: Project[] = [
   },
 ];
 
-const pad = (n: number) => String(n).padStart(2, "0");
 
 // The pinned horizontal gallery runs on wide screens. Phones, tablets and the
 // pre-rendered HTML get a vertical stack. The sideways movement follows the visitor's
@@ -178,7 +179,16 @@ const Tags = ({ tags }: { tags: string[] }) => (
   </ul>
 );
 
-const OutlineNumber = ({ n, className }: { n: number; className?: string }) => (
+/** First letters of the first two words, e.g. "China Lanka Motors" -> "CL". */
+const initials = (title: string) =>
+  title
+    .split(" ")
+    .slice(0, 2)
+    .map((w) => w[0])
+    .join("")
+    .toUpperCase();
+
+const OutlineMark = ({ text, className }: { text: string; className?: string }) => (
   <span
     aria-hidden="true"
     className={cn(
@@ -187,7 +197,7 @@ const OutlineNumber = ({ n, className }: { n: number; className?: string }) => (
     )}
     style={{ WebkitTextStroke: "1px hsl(var(--foreground) / 0.12)" }}
   >
-    {pad(n)}
+    {text}
   </span>
 );
 
@@ -320,12 +330,15 @@ const HorizontalGallery = () => {
   }, []);
 
   return (
-    <section ref={sectionRef} aria-label="Projects" className="relative h-screen overflow-hidden">
+    // GSAP wraps the pinned section in a spacer element. This wrapper keeps that
+    // spacer out of React's way, so the page can update or unmount safely.
+    <div>
+      <section ref={sectionRef} aria-label="Projects" className="relative h-screen overflow-hidden">
       <div ref={trackRef} className="flex h-full w-max items-center will-change-transform">
         {/* Intro panel */}
         <div className="flex h-full w-[42vw] shrink-0 flex-col justify-center pl-[6vw] pr-[4vw]">
           <p className="mb-6 text-sm font-medium uppercase tracking-widest text-muted-foreground">
-            {pad(projects.length)} live projects
+            Selected projects
           </p>
           <p className="text-display-md text-foreground/80">
             Scroll to travel through the work. Every site here is live, so you can visit it.
@@ -345,12 +358,11 @@ const HorizontalGallery = () => {
             className="group relative flex h-full w-[86vw] max-w-[1400px] shrink-0 items-center px-[3vw]"
           >
             <div data-number className="absolute -top-[2vh] right-[2vw]">
-              <OutlineNumber n={i + 1} className="text-[28vw]" />
+              <OutlineMark text={initials(project.title)} className="text-[24vw]" />
             </div>
             <div className="relative z-10 grid w-full grid-cols-12 items-center gap-10 pt-16">
               <div className="col-span-4 flex flex-col gap-6">
                 <div data-reveal className="flex items-center gap-3 font-mono text-xs text-muted-foreground">
-                  <span className="text-foreground">{pad(i + 1)}</span>
                   <span className="h-px w-10 bg-white/20" />
                   <span className="uppercase tracking-widest">{project.category}</span>
                 </div>
@@ -393,9 +405,6 @@ const HorizontalGallery = () => {
 
       {/* Progress */}
       <div className="pointer-events-none absolute bottom-8 left-[6vw] right-[6vw] flex items-center gap-6">
-        <span className="font-mono text-xs text-muted-foreground">
-          <span className="text-foreground">{pad(active + 1)}</span> / {pad(projects.length)}
-        </span>
         <div className="h-px flex-1 bg-white/10">
           <div ref={progressRef} className="h-px origin-left scale-x-0 bg-foreground" />
         </div>
@@ -403,7 +412,8 @@ const HorizontalGallery = () => {
           {projects[active].title}
         </span>
       </div>
-    </section>
+      </section>
+    </div>
   );
 };
 
@@ -421,12 +431,11 @@ const StackedGallery = () => (
         transition={{ duration: 0.6 }}
         className="group relative"
       >
-        <OutlineNumber n={i + 1} className="absolute -top-14 right-0 text-[34vw] md:-top-20 md:text-[22vw]" />
+        <OutlineMark text={initials(project.title)} className="absolute -top-14 right-0 text-[30vw] md:-top-20 md:text-[20vw]" />
         <div className="relative z-10">
           <BrowserFrame project={project} />
           <div className="mt-8 flex flex-col gap-5">
             <div className="flex items-center gap-3 font-mono text-xs text-muted-foreground">
-              <span className="text-foreground">{pad(i + 1)}</span>
               <span className="h-px w-10 bg-white/20" />
               <span className="uppercase tracking-widest">{project.category}</span>
             </div>
@@ -460,7 +469,6 @@ const StackedGallery = () => (
 // ---------------------------------------------------------------------------
 const Projects = () => {
   const horizontal = useHorizontal();
-  const industries = new Set(projects.map((p) => p.category)).size;
 
   return (
     <div className="min-h-screen bg-background">
@@ -508,21 +516,29 @@ const Projects = () => {
                 Websites, platforms, and online stores we designed and built for real businesses in
                 automotive, travel, fashion, education, hospitality, and lifestyle.
               </p>
-              <dl className="flex gap-12">
-                <div>
-                  <dt className="text-xs uppercase tracking-widest text-muted-foreground">Live projects</dt>
-                  <dd className="mt-2 text-4xl font-bold">{pad(projects.length)}</dd>
-                </div>
-                <div>
-                  <dt className="text-xs uppercase tracking-widest text-muted-foreground">Industries</dt>
-                  <dd className="mt-2 text-4xl font-bold">{pad(industries)}</dd>
-                </div>
-              </dl>
+              <a
+                href="#project-showcase"
+                className="group flex shrink-0 items-center gap-4 text-xs uppercase tracking-[0.3em] text-muted-foreground transition-colors hover:text-foreground"
+              >
+                Scroll to explore
+                <span className="relative flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border border-white/15 transition-colors group-hover:border-white/40">
+                  <motion.span
+                    animate={{ y: ["-150%", "150%"] }}
+                    transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+                  >
+                    <ArrowDown size={16} />
+                  </motion.span>
+                </span>
+              </a>
             </motion.div>
           </div>
         </section>
 
+        <WorkWindow />
+
         {horizontal ? <HorizontalGallery /> : <StackedGallery />}
+
+        <ToolPlayground />
       </main>
       <Footer />
     </div>
